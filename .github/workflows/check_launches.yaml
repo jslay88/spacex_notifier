@@ -35,7 +35,7 @@ jobs:
       - name: Run Python script
         run: python main.py
         env:
-          CACHE_PATH: notified-launches
+          CACHE_PATH: notified-launches.json
 
       - name: Save notified launches to cache
         if: success() && steps.restore-cache.outputs.cache-hit != 'true'
