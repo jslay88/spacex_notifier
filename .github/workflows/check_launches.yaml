@@ -1,4 +1,4 @@
-name: Python Script Workflow
+name: Check for SpaceX Launches
 
 on:
   schedule:
