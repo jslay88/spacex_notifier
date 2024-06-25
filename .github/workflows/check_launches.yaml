@@ -1,0 +1,49 @@
+name: Python Script Workflow
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # Run every 5 minutes
+
+jobs:
+  run_python_script:
+    runs-on: ubuntu-latest  # Use the latest Ubuntu environment
+
+    env:
+      PUSHOVER_API_TOKEN: ${{ secrets.PUSHOVER_API_TOKEN }}
+      PUSHOVER_GROUP_KEY: ${{ secrets.PUSHOVER_GROUP_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2  # Checkout the repository to access its contents
+
+      - name: Set up Python
+        uses: actions/setup-python@v2  # Set up Python environment
+
+      - name: Restore cached notified launches
+        id: restore-cache
+        uses: actions/cache@v2
+        with:
+          path: notified-launches.json
+          key: notified-launches-${{ runner.os }}
+
+      - name: Install dependencies
+        if: steps.restore-cache.outputs.cache-hit != 'true'
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # Install dependencies from requirements.txt
+
+      - name: Run Python script
+        run: python main.py
+        env:
+          CACHE_PATH: notified-launches
+
+      - name: Save notified launches to cache
+        if: success() && steps.restore-cache.outputs.cache-hit != 'true'
+        id: save-cache
+        uses: actions/cache@v2
+        with:
+          path: notified-launches.json
+          key: notified-launches-${{ runner.os }}
+          restore-keys: |
+            notified-launches-
+

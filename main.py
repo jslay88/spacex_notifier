@@ -1,14 +1,36 @@
-import requests
-from datetime import datetime, timedelta
-import pytz  # pip install pytz
+import json
 import os
+from datetime import datetime, timedelta
+
+import pytz
+import requests
+
 
 # Pushover settings
 PUSHOVER_API_TOKEN = os.getenv("PUSHOVER_API_TOKEN")
 PUSHOVER_USER_KEY = os.getenv("PUSHOVER_USER_KEY", os.getenv("PUSHOVER_GROUP_KEY"))
 
+CACHE_PATH = os.getenv('CACHE_PATH', 'notified-launches.json')
+
 # URL to fetch SpaceX launches
 url = "https://fdo.rocketlaunch.live/json/launches/next/5"
+
+
+def load_notified_launches():
+    try:
+        with open(CACHE_PATH, 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+
+
+def save_notified_launches(notified_launches):
+    with open(CACHE_PATH, 'w') as f:
+        json.dump(notified_launches, f)
+
+
+def has_notified(launch_id):
+    return launch_id in load_notified_launches()
 
 
 # Function to send Pushover notification
@@ -51,9 +73,13 @@ def main():
         data = response.json()
 
         # Iterate through launches
+        ids = []
         for launch in data.get('result', []):
+            ids.append(launch['id'])
             # Check if the launch is SpaceX and within the next hour
-            if launch['provider']['name'] == 'SpaceX' and check_launch_within_next_hour(launch):
+            if (launch['provider']['name'] == 'SpaceX'
+                    and check_launch_within_next_hour(launch)
+                    and not has_notified(launch['id'])):
                 # Prepare notification message
                 title = f"SpaceX Launch Alert: {launch['name']}"
                 message = f"{launch['launch_description']} - {launch['quicktext']}"
@@ -61,11 +87,18 @@ def main():
                 # Send Pushover notification
                 send_pushover_notification(title, message)
 
+                save_notified_launches(load_notified_launches() + [launch['id']])
+
                 # Print confirmation
                 print(f"Notification sent for SpaceX launch: {launch['name']}")
-                break  # Exit loop after sending first notification (if multiple launches are within the hour)
-        else:
-            print("No SpaceX launches found within the next hour.")
+
+        # Clear cache from launches that have passed
+        notified_ids = load_notified_launches()
+        for _id in notified_ids:
+            if _id not in ids:
+                notified_ids.remove(_id)
+        save_notified_launches(notified_ids)
+
     else:
         print(f"Failed to retrieve data: {response.status_code} - {response.reason}")
 
