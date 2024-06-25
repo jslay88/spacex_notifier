@@ -21,7 +21,7 @@ jobs:
 
       - name: Restore cached notified launches
         id: restore-cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: notified-launches.json
           key: notified-launches
@@ -39,7 +39,7 @@ jobs:
       - name: Save notified launches to cache
         if: success()
         id: save-cache
-        uses: actions/cache@v4
+        uses: actions/cache/save@v4
         with:
           path: notified-launches.json
           key: notified-launches
