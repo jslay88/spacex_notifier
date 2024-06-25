@@ -40,7 +40,7 @@ jobs:
 
       - name: Get current timestamp
         id: timestamp
-        run: echo "time=$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
+        run: echo "time=$(date +%Y%m%d%H%M%S)" >> "$GITHUB_OUTPUT"
 
       - name: Save cached notified launches
         id: save-cache
