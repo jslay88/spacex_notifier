@@ -24,7 +24,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: notified-launches.json
-          key: notified-launches-${{ runner.os }}
+          key: notified-launches
 
       - name: Install dependencies
         if: steps.restore-cache.outputs.cache-hit != 'true'
@@ -43,6 +43,6 @@ jobs:
         uses: actions/cache@v4
         with:
           path: notified-launches.json
-          key: notified-launches-${{ runner.os }}
+          key: notified-launches
           restore-keys: |
-            notified-launches-
+            notified-launches
