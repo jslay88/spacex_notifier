@@ -14,14 +14,14 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2  # Checkout the repository to access its contents
+        uses: actions/checkout@v4  # Checkout the repository to access its contents
 
       - name: Set up Python
-        uses: actions/setup-python@v2  # Set up Python environment
+        uses: actions/setup-python@v5  # Set up Python environment
 
       - name: Restore cached notified launches
         id: restore-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: notified-launches.json
           key: notified-launches-${{ runner.os }}
@@ -40,7 +40,7 @@ jobs:
       - name: Save notified launches to cache
         if: success() && steps.restore-cache.outputs.cache-hit != 'true'
         id: save-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: notified-launches.json
           key: notified-launches-${{ runner.os }}
