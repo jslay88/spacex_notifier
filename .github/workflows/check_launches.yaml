@@ -44,5 +44,3 @@ jobs:
         with:
           path: notified-launches.json
           key: notified-launches
-          restore-keys: |
-            notified-launches
