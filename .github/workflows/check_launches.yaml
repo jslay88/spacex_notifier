@@ -40,11 +40,11 @@ jobs:
 
       - name: Get current timestamp
         id: timestamp
-        run: echo "::set-output name=time::$(date +%Y%m%d%H%M%S)"
+        run: echo "time=$(date +%Y%m%d%H%M%S)" >> $TIMESTAMP
 
       - name: Save cached notified launches
         id: save-cache
         uses: actions/cache/save@v4
         with:
           path: notified-launches.json
-          key: notified-launches-${{ steps.timestamp.outputs.time }}
+          key: notified-launches-${{ env.TIMESTAMP }}
