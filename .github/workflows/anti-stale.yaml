@@ -1,0 +1,36 @@
+name: Keep Repository Active
+
+on:
+  schedule:
+    # Run on the first day of each month at 00:00 UTC
+    - cron: '0 0 1 * *'
+
+jobs:
+  keep-active:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Create a new branch
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        BRANCH_NAME="keep-active-$(date +'%Y-%m')"
+        git checkout -b $BRANCH_NAME
+
+    - name: Create a pseudo-commit
+      run: |
+        echo "Keeping repository active for $(date +'%Y-%m')" > keep_active.txt
+        git add keep_active.txt
+        git commit -m "chore: keep repository active for $(date +'%Y-%m')"
+
+    - name: Push branch to GitHub
+      run: |
+        git push origin $BRANCH_NAME
+
+    - name: Delete branch
+      run: |
+        git push origin --delete $BRANCH_NAME
+
