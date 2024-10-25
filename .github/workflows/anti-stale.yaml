@@ -28,7 +28,7 @@ jobs:
 
     - name: Push branch to GitHub
       run: |
-        git push origin $BRANCH_NAME
+        git push -u origin $BRANCH_NAME
 
     - name: Delete branch
       run: |
