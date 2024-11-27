@@ -4,6 +4,7 @@ on:
   schedule:
     # Run on the first day of each month at 00:00 UTC
     - cron: '0 0 1 * *'
+  workflow_dispatch:
 
 jobs:
   keep-active:
@@ -18,6 +19,7 @@ jobs:
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
         BRANCH_NAME="keep-active-$(date +'%Y-%m')"
+        echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
         git checkout -b $BRANCH_NAME
 
     - name: Create a pseudo-commit
@@ -28,9 +30,8 @@ jobs:
 
     - name: Push branch to GitHub
       run: |
-        git push -u origin $BRANCH_NAME
+        git push --set-upstream origin $BRANCH_NAME
 
     - name: Delete branch
       run: |
-        git push origin --delete $BRANCH_NAME
-
+        git push -d origin $BRANCH_NAME
